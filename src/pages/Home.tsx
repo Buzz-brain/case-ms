@@ -147,10 +147,10 @@ const Home = () => {
                 </span>
               </h1>
 
-              <p className="hero-animate text-lg sm:text-xl text-white mb-10 max-w-2xl mx-auto">
-                Transform your legal practice with our comprehensive case
-                management platform. Streamline workflows, enhance
-                collaboration, and deliver exceptional results.
+                <p className="hero-animate text-base sm:text-lg text-muted-foreground mb-10 max-w-2xl mx-auto">
+                  Transform your legal practice with our comprehensive case
+                  management platform. Streamline workflows, enhance
+                  collaboration, and deliver exceptional results.
               </p>
 
               <div className="hero-animate flex flex-col sm:flex-row items-center justify-center gap-4">
