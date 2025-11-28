@@ -3,63 +3,78 @@ import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Scale, ArrowRight, Shield, Users, FileText, CheckCircle } from 'lucide-react';
+import {
+  FileCheck,
+  Users,
+  Shield,
+  Zap,
+  ArrowRight,
+  CheckCircle2,
+  BarChart3,
+  Clock,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { useCases } from '@/contexts/CasesContext';
 import CaseCard from '@/components/CaseCard';
 import MainLayout from '@/layouts/MainLayout';
+import ThreeGavelScene from '@/components/ThreeGavelScene';
+import heroImage from "../assets/hero-bg.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const Home = () => {
   const { cases } = useCases();
-  const heroRef = useRef<HTMLDivElement>(null);
-  const featuresRef = useRef<HTMLDivElement>(null);
-  const statsRef = useRef<HTMLDivElement>(null);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const featuresRef = useRef<HTMLDivElement | null>(null);
+  const statsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Hero parallax
-    if (heroRef.current) {
-      gsap.to(heroRef.current.querySelector('.hero-bg'), {
-        yPercent: 30,
-        ease: 'none',
-        scrollTrigger: {
-          trigger: heroRef.current,
-          start: 'top top',
-          end: 'bottom top',
-          scrub: true,
-        },
-      });
-    }
+    if (!heroRef.current) return;
 
-    // Features animation
+    // Hero entrance animations
+    const heroElements = heroRef.current.querySelectorAll('.hero-animate');
+    gsap.fromTo(heroElements, { y: 80, opacity: 0 }, { y: 0, opacity: 1, duration: 0.9, stagger: 0.15, ease: 'power3.out' });
+
+    // Features scroll animation
     if (featuresRef.current) {
-      gsap.from(featuresRef.current.querySelectorAll('.feature-card'), {
-        y: 100,
-        opacity: 0,
-        stagger: 0.2,
-        scrollTrigger: {
-          trigger: featuresRef.current,
-          start: 'top center+=100',
-          end: 'bottom center',
-          toggleActions: 'play none none reverse',
-        },
+      const featureCards = featuresRef.current.querySelectorAll('.feature-card');
+      featureCards.forEach((card, i) => {
+        gsap.fromTo(
+          card,
+          { y: 60, opacity: 0, scale: 0.98 },
+          {
+            y: 0,
+            opacity: 1,
+            scale: 1,
+            duration: 0.7,
+            delay: i * 0.08,
+            scrollTrigger: {
+              trigger: card,
+              start: 'top 85%',
+              toggleActions: 'play none none reverse',
+            },
+          }
+        );
       });
     }
 
-    // Stats counter
+    // Stats counter animation
     if (statsRef.current) {
-      const stats = statsRef.current.querySelectorAll('.stat-number');
-      stats.forEach((stat) => {
-        const target = parseInt(stat.getAttribute('data-target') || '0');
-        gsap.to(stat, {
-          textContent: target,
-          duration: 2,
-          snap: { textContent: 1 },
+      const statNumbers = statsRef.current.querySelectorAll('.stat-number');
+      statNumbers.forEach((stat) => {
+        const target = parseInt(stat.getAttribute('data-target') || '0', 10);
+        gsap.to({ val: 0 }, {
+          val: target,
+          duration: 1.8,
+          ease: 'power1.out',
           scrollTrigger: {
             trigger: stat,
-            start: 'top center+=200',
+            start: 'top 90%',
+          },
+          onUpdate() {
+            // @ts-ignore
+            stat.textContent = Math.ceil((this as any).targets()[0].val).toString();
           },
         });
       });
@@ -67,204 +82,295 @@ const Home = () => {
   }, []);
 
   const features = [
-    {
-      icon: Shield,
-      title: 'Secure & Confidential',
-      description: 'Enterprise-grade security with end-to-end encryption for all your sensitive case data.',
-    },
-    {
-      icon: Users,
-      title: 'Collaborative Workflow',
-      description: 'Seamlessly collaborate with your team and clients in real-time on any case.',
-    },
-    {
-      icon: FileText,
-      title: 'Document Management',
-      description: 'Organize, store, and access all case documents from a centralized location.',
-    },
-    {
-      icon: CheckCircle,
-      title: 'Task Automation',
-      description: 'Automate routine tasks and focus on what matters most - winning cases.',
-    },
+    { icon: FileCheck, title: 'Case Management', description: 'Organize and track all your cases with powerful management tools and intuitive workflows.' },
+    { icon: Users, title: 'Team Collaboration', description: 'Work seamlessly with your team through real-time updates and threaded discussions.' },
+    { icon: Shield, title: 'Secure & Compliant', description: 'Enterprise-grade security with full compliance to legal industry standards.' },
+    { icon: Zap, title: 'Lightning Fast', description: 'Blazing fast performance ensures you stay productive without any delays.' },
+    { icon: BarChart3, title: 'Analytics & Reports', description: 'Gain insights with comprehensive analytics and customizable reporting tools.' },
+    { icon: Clock, title: 'Time Tracking', description: 'Accurately track billable hours and manage time across all your cases.' },
   ];
 
   const stats = [
-    { label: 'Cases Managed', value: 1250 },
-    { label: 'Success Rate', value: 96 },
-    { label: 'Happy Clients', value: 500 },
-    { label: 'Legal Experts', value: 45 },
+    { number: 500, label: 'Active Cases', suffix: '+' },
+    { number: 50, label: 'Team Members', suffix: '+' },
+    { number: 98, label: 'Client Satisfaction', suffix: '%' },
+    { number: 1000, label: 'Documents Managed', suffix: '+' },
   ];
+
+  const benefits = [
+    'Streamlined case workflows',
+    'Real-time collaboration',
+    'Advanced search capabilities',
+    'Automated notifications',
+    'Custom reporting',
+    'Mobile access',
+  ];
+
+  // Use a high-quality external image as a stable default for the hero background.
+  // const heroUrl = 'https://images.unsplash.com/photo-1521737604893-d14cc237f11d?q=80&w=2400&auto=format&fit=crop&ixlib=rb-4.0.3&s=0a5a9c0a6f3c2b4f3f6b7c3b1e8f1a8c';
+  const heroUrl = heroImage;
 
   return (
     <MainLayout>
-      {/* Hero Section */}
-      <section ref={heroRef} className="relative h-screen overflow-hidden">
-        <div className="hero-bg absolute inset-0 bg-gradient-to-br from-primary via-primary/90 to-accent -z-10" />
-        
-        <div className="container mx-auto px-4 h-full flex items-center">
-          <div className="max-w-3xl">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              <div className="flex items-center gap-3 mb-6">
-                <Scale className="h-12 w-12 text-accent" />
-                <span className="text-accent text-lg font-semibold">CaseMS</span>
-              </div>
-              <h1 className="text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-                Modern Case Management
-                <span className="block text-accent">Simplified</span>
-              </h1>
-              <p className="text-xl text-white/90 mb-8 max-w-2xl">
-                Streamline your legal practice with intelligent case management, automated workflows, and secure collaboration tools.
-              </p>
-              <div className="flex flex-wrap gap-4">
-                <Link to="/cases">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button size="lg" className="bg-accent hover:bg-accent/90 text-white gap-2">
-                      Explore Cases
-                      <ArrowRight className="h-5 w-5" />
-                    </Button>
-                  </motion.div>
-                </Link>
-                <Link to="/about">
-                  <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                    <Button size="lg" variant="outline" className="bg-white/10 hover:bg-white/20 text-white border-white/30">
-                      Learn More
-                    </Button>
-                  </motion.div>
-                </Link>
-              </div>
-            </motion.div>
-          </div>
-        </div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-          animate={{ y: [0, 10, 0] }}
-          transition={{ duration: 2, repeat: Infinity }}
+      <div className="min-h-screen">
+        {/* Hero Section */}
+        <section
+          id="hero-section"
+          ref={heroRef}
+          className="relative min-h-screen flex items-center justify-center overflow-hidden"
+          style={{
+            backgroundImage: `linear-gradient(rgba(8,12,20,0.75), rgba(8,12,20,0.82)), url(${heroUrl})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            backgroundAttachment: "fixed",
+          }}
         >
-          <div className="w-6 h-10 border-2 border-white/50 rounded-full flex justify-center pt-2">
-            <div className="w-1 h-2 bg-white/50 rounded-full" />
-          </div>
-        </motion.div>
-      </section>
-
-      {/* Stats Section */}
-      <section ref={statsRef} className="py-20 bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {stats.map((stat, index) => (
+          {/* 3D Canvas (renders above hero content) */}
+          {/* <ThreeGavelScene /> */}
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-20 relative z-10">
+            <div className="max-w-4xl mx-auto text-center">
               <motion.div
-                key={stat.label}
-                initial={{ opacity: 0, scale: 0.8 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: index * 0.1 }}
-                className="text-center"
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ duration: 0.5 }}
+                className="inline-block mb-6 px-4 py-2 bg-accent/20 backdrop-blur-sm rounded-full border border-accent/30"
               >
-                <div className="text-5xl font-bold text-accent mb-2">
-                  <span className="stat-number" data-target={stat.value}>0</span>
-                  {stat.label === 'Success Rate' && '%'}
-                  {stat.label !== 'Success Rate' && '+'}
-                </div>
-                <div className="text-muted-foreground">{stat.label}</div>
+                <span className="text-accent font-medium text-sm">
+                  Modern Case Management Solution
+                </span>
               </motion.div>
-            ))}
+
+              <h1 className="hero-animate text-4xl sm:text-5xl lg:text-7xl font-bold text-white mb-6 leading-tight">
+                Manage Cases with
+                <span className="block text-white bg-clip-text bg-gradient-to-r from-teal-bright to-accent">
+                  Confidence &amp; Clarity
+                </span>
+              </h1>
+
+              <p className="hero-animate text-lg sm:text-xl text-white mb-10 max-w-2xl mx-auto">
+                Transform your legal practice with our comprehensive case
+                management platform. Streamline workflows, enhance
+                collaboration, and deliver exceptional results.
+              </p>
+
+              <div className="hero-animate flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link to="/cases">
+                  <Button
+                    size="lg"
+                    className="bg-accent hover:bg-accent/90 text-accent-foreground text-lg px-8 py-6 group"
+                  >
+                    Browse Cases
+                    <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </Button>
+                </Link>
+                <Link to="/contact">
+                  <Button
+                    size="lg"
+                    variant="outline"
+                    className="border-2 border-white text-black hover:bg-white hover:text-slate-dark text-lg px-8 py-6"
+                  >
+                    Contact Us
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section ref={featuresRef} className="py-20">
-        <div className="container mx-auto px-4">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              Why Choose <span className="text-accent">CaseMS</span>
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Built for legal professionals who demand excellence, efficiency, and security.
-            </p>
-          </motion.div>
+          {/* Subtle decorative overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-black/10 to-black/30 pointer-events-none" />
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {features.map((feature, index) => {
-              const Icon = feature.icon;
-              return (
-                <Card key={index} className="feature-card p-6 hover:shadow-lg transition-all">
-                  <div className="w-14 h-14 bg-accent/10 rounded-lg flex items-center justify-center mb-4">
-                    <Icon className="h-7 w-7 text-accent" />
+          {/* Scroll Indicator */}
+          {/* <motion.div animate={{ y: [0, 10, 0] }} transition={{ repeat: Infinity, duration: 2 }} className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+            <div className="w-6 h-10 border-2 border-white/30 rounded-full p-1">
+              <div className="w-1.5 h-3 bg-accent rounded-full mx-auto animate-pulse" />
+            </div>
+          </motion.div> */}
+        </section>
+
+        {/* Stats Section */}
+        <section
+          id="stats-section"
+          ref={statsRef}
+          className="py-20 bg-secondary"
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-8">
+              {stats.map((stat, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ scale: 0.6, opacity: 0 }}
+                  whileInView={{ scale: 1, opacity: 1 }}
+                  transition={{ delay: index * 0.08 }}
+                  viewport={{ once: true }}
+                  className="text-center"
+                >
+                  <div className="text-4xl lg:text-5xl font-bold text-accent mb-2">
+                    <span className="stat-number" data-target={stat.number}>
+                      0
+                    </span>
+                    <span>{stat.suffix}</span>
                   </div>
-                  <h3 className="text-xl font-bold mb-2">{feature.title}</h3>
+                  <div className="text-muted-foreground font-medium">
+                    {stat.label}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Features Section */}
+        <section
+          id="needs-section"
+          ref={featuresRef}
+          className="py-20 lg:py-32"
+        >
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center max-w-3xl mx-auto mb-16">
+              <motion.h2
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                className="text-3xl lg:text-5xl font-bold mb-6"
+              >
+                Everything You Need to{" "}
+                <span className="text-accent"> Excel</span>
+              </motion.h2>
+              <motion.p
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{ y: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="text-lg text-muted-foreground"
+              >
+                Powerful features designed for modern legal professionals
+              </motion.p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {features.map((feature, index) => (
+                <Card
+                  key={index}
+                  className="feature-card p-8 hover:shadow-lg transition-all duration-300 border-2 hover:border-accent cursor-pointer group"
+                >
+                  <div className="mb-4 p-3 bg-accent/10 rounded-lg inline-block group-hover:bg-accent group-hover:scale-110 transition-all duration-300">
+                    <feature.icon className="w-8 h-8 text-accent group-hover:text-accent-foreground" />
+                  </div>
+                  <h3 className="text-xl font-bold mb-3 group-hover:text-accent transition-colors">
+                    {feature.title}
+                  </h3>
                   <p className="text-muted-foreground">{feature.description}</p>
                 </Card>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Recent Cases Section */}
-      <section className="py-20 bg-secondary">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center justify-between mb-12">
-            <div>
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
-                Recent <span className="text-accent">Cases</span>
-              </h2>
-              <p className="text-xl text-muted-foreground">
-                Explore our latest case studies and legal matters
-              </p>
+              ))}
             </div>
-            <Link to="/cases">
-              <Button variant="outline" className="gap-2">
-                View All Cases
-                <ArrowRight className="h-4 w-4" />
-              </Button>
-            </Link>
           </div>
+        </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {cases.slice(0, 3).map((caseItem, index) => (
-              <CaseCard key={caseItem.id} case={caseItem} index={index} />
-            ))}
+        {/* Recent Cases Section (keeps original behavior) */}
+        <section className="py-20 bg-secondary">
+          <div className="container mx-auto px-4">
+            <div className="flex items-center justify-between mb-12">
+              <div>
+                <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                  Recent <span className="text-accent">Cases</span>
+                </h2>
+                <p className="text-xl text-muted-foreground">
+                  Explore our latest case studies and legal matters
+                </p>
+              </div>
+              <Link to="/cases">
+                <Button variant="outline" className="gap-2">
+                  View All Cases <ArrowRight className="h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {cases.slice(0, 3).map((caseItem, index) => (
+                <CaseCard key={caseItem.id} case={caseItem} index={index} />
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <Card className="bg-gradient-to-br from-primary to-accent p-12 text-center text-white">
+        {/* Benefits + CTA sections unchanged (enhanced styling kept) */}
+        <section className="py-20 bg-primary text-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <motion.div
+                initial={{ x: -100, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+              >
+                <h2 className="text-3xl lg:text-5xl font-bold mb-6">
+                  Why Choose CaseFlow?
+                </h2>
+                <p className="text-lg text-slate-light mb-8">
+                  Join hundreds of legal professionals who trust CaseFlow to
+                  manage their cases efficiently and effectively.
+                </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {benefits.map((benefit, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ x: -50, opacity: 0 }}
+                      whileInView={{ x: 0, opacity: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: index * 0.08 }}
+                      className="flex items-center space-x-3"
+                    >
+                      <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0" />
+                      <span>{benefit}</span>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
+
+              <motion.div
+                initial={{ x: 100, opacity: 0 }}
+                whileInView={{ x: 0, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8 }}
+                className="relative"
+              >
+                <div className="aspect-square bg-accent/10 rounded-2xl backdrop-blur-sm border border-accent/30 p-8 flex items-center justify-center">
+                  <div className="text-center">
+                    <div className="text-6xl font-bold mb-4">10,000+</div>
+                    <div className="text-xl">Cases Managed Successfully</div>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+
+        <section className="py-20">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.5 }}
+              initial={{ scale: 0.95, opacity: 0 }}
+              whileInView={{ scale: 1, opacity: 1 }}
+              viewport={{ once: true }}
+              className="bg-accent rounded-3xl p-12 lg:p-16 text-center text-white"
             >
-              <h2 className="text-4xl md:text-5xl font-bold mb-4">
+              <h2 className="text-3xl lg:text-5xl font-bold mb-6">
                 Ready to Transform Your Practice?
               </h2>
-              <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-                Join hundreds of legal professionals who trust CaseMS for their case management needs.
+              <p className="text-lg lg:text-xl mb-8 max-w-2xl mx-auto opacity-90">
+                Start managing your cases more efficiently today with CaseFlow
               </p>
               <Link to="/contact">
-                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                  <Button size="lg" className="bg-white text-primary hover:bg-white/90 gap-2">
-                    Get Started Today
-                    <ArrowRight className="h-5 w-5" />
-                  </Button>
-                </motion.div>
+                <Button
+                  size="lg"
+                  className="bg-white text-accent hover:bg-slate-light text-lg px-10 py-6"
+                >
+                  Get Started Now
+                </Button>
               </Link>
             </motion.div>
-          </Card>
-        </div>
-      </section>
+          </div>
+        </section>
+      </div>
     </MainLayout>
   );
 };

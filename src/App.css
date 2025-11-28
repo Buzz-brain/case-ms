@@ -27,6 +27,18 @@
   }
 }
 
+  /* Gavel impact burst */
+  .gavel-impact-burst {
+    position: fixed;
+    width: 260px;
+    height: 260px;
+    transform: translate(-50%, -40%);
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.9) 0%, rgba(255,255,255,0.6) 10%, rgba(255,255,255,0.2) 30%, rgba(255,255,255,0) 60%);
+    mix-blend-mode: screen;
+    z-index: 60;
+  }
 @media (prefers-reduced-motion: no-preference) {
   a:nth-of-type(2) .logo {
     animation: logo-spin infinite 20s linear;

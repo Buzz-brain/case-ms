@@ -25,17 +25,20 @@ const About = () => {
       });
     }
 
-    if (valuesRef.current) {
-      gsap.from(valuesRef.current.querySelectorAll('.value-card'), {
-        y: 50,
-        opacity: 0,
-        stagger: 0.2,
-        scrollTrigger: {
-          trigger: valuesRef.current,
-          start: 'top center+=100',
-        },
-      });
-    }
+      if (valuesRef.current) {
+        // Ensure cards are visible by default
+        gsap.set(valuesRef.current.querySelectorAll('.value-card'), { opacity: 1, y: 0 });
+        gsap.from(valuesRef.current.querySelectorAll('.value-card'), {
+          y: 50,
+          opacity: 0,
+          stagger: 0.2,
+          scrollTrigger: {
+            trigger: valuesRef.current,
+            start: 'top 90%', // Trigger earlier for reliability
+            toggleActions: 'play none none reverse',
+          },
+        });
+      }
   }, []);
 
   const values = [
