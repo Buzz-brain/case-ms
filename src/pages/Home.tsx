@@ -269,23 +269,23 @@ const Home = () => {
         {/* Recent Cases Section (keeps original behavior) */}
         <section className="py-20 bg-secondary">
           <div className="container mx-auto px-4">
-            <div className="flex items-center justify-between mb-12">
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between mb-12">
               <div>
-                <h2 className="text-4xl md:text-5xl font-bold mb-4">
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4">
                   Recent <span className="text-accent">Cases</span>
                 </h2>
-                <p className="text-xl text-muted-foreground">
+                <p className="text-lg sm:text-xl text-muted-foreground">
                   Explore our latest case studies and legal matters
                 </p>
               </div>
-              <Link to="/cases">
-                <Button variant="outline" className="gap-2">
+              <Link to="/cases" className="self-start md:self-auto">
+                <Button variant="outline" className="gap-2 px-4 py-2 w-full sm:w-auto">
                   View All Cases <ArrowRight className="h-4 w-4" />
                 </Button>
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {cases.slice(0, 3).map((caseItem, index) => (
                 <CaseCard key={caseItem.id} case={caseItem} index={index} />
               ))}
@@ -334,7 +334,7 @@ const Home = () => {
                 transition={{ duration: 0.8 }}
                 className="relative"
               >
-                <div className="aspect-square bg-accent/10 rounded-2xl backdrop-blur-sm border border-accent/30 p-8 flex items-center justify-center">
+                <div className="aspect-square bg-accent/10 rounded-2xl backdrop-blur-sm border border-accent/30 p-5 flex items-center justify-center">
                   <div className="text-center">
                     <div className="text-6xl font-bold mb-4">10,000+</div>
                     <div className="text-xl">Cases Managed Successfully</div>
